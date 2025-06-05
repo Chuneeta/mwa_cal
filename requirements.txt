@@ -2,3 +2,4 @@ numpy
 pandas
 matplotlib
 astropy
+https://github.com/Chuneeta/mwa_qa.git

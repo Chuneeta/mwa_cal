@@ -7,6 +7,22 @@ from scipy.ndimage import uniform_filter
 import copy
 
 
+calpols = {'xx': 0,
+        'yy': 3,
+        'xy': 1,
+        'yx': 2
+        } 
+
+calpol_inds = [0, 3, 1, 2]
+
+uvpols = {'xx': 0,
+        'yy': 1,
+        'xy': 2,
+        'yx': 3
+        } 
+
+calpols = [0, 3, 1, 2]
+
 def create_calibration_fits(metafits, solutions_data=None, output_name=None, overwrite=None):
     """
     Creates fits file compatible with Hyperdrive calibration fits file
@@ -227,7 +243,7 @@ def evaluate_auto_init(data_uvfits,  model_uvfits):
         model_mean = resistant_mean(np.abs(model_all[:, :, pol]), deviations=2)
         auto_scale[pol] = np.sqrt(data_mean / model_mean)
 
-        gain = np.sqrt(vis_auto[pol] * weight_invert(vis_auto_model[pol]))
+        gain = np.sqrt(data_autos[:, :, pol] * weight_invert(model_autos[:, :, pol]))
         gain *= auto_scale[pol_i] * weight_invert(np.mean(gain))
 
         gain[np.isnan(gain)] = 1
@@ -300,10 +316,10 @@ def cal_auto_ratio_divide(gains, vis_auto, ref_antenna):
     for pol_i in range(n_pol):
         v0 = vis_auto_avg[ref_antenna, :, pol_i]
         norm = weight_invert(v0)
-        auto_ratio[: , :, pol_i] = np.sqrt(
+        auto_ratio[: , :, calpols[pol_i]] = np.sqrt(
             vis_auto_avg[:, :, pol_i] * norm
         )
-        auto_gains[: ,:, pol_i] = gain_avg[:, :, pol_i] * weight_invert(auto_ratio[:, :, pol_i])
+        auto_gains[: ,:, calpols[pol_i]] = gain_avg[:, :, calpols[pol_i]] * weight_invert(auto_ratio[:, :, pol_i])
     return auto_gains, auto_ratio
 
 def cal_auto_ratio_remultiply(gains, auto_ratio):
@@ -686,7 +702,6 @@ def vis_cal_auto_fit(vis_auto,
     gain_cross = gains
     gains_autofit = copy.deepcopy(gain_cross)
     fit_slope = np.empty((n_tile, n_pol))
-    fit_offset = np.empty_like(fit_slope)
 
     # Didn't vectorize as the polyfit won't be vectorized
     for pol_i in range(n_pol):
@@ -696,7 +711,7 @@ def vis_cal_auto_fit(vis_auto,
                 gain_cross[tile_idx, :, pol_i].imag, gain_cross[tile_idx, :, pol_i].real
             )
 
-            gain_auto_single = np.abs(auto_gain[tile_idx, :, pol_i])
+            gain_auto_single = np.abs(auto_gain[tile_idx, :, calpols[pol_i]])
             gain_cross_single = np.abs(gain_cross[tile_idx, :, pol_i])
 
             # mask out any NaN values; numpy doesn't like them,

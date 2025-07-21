@@ -1,7 +1,7 @@
 import numpy as np
 from mwa_qa.read_uvfits import UVfits
 from mwa_qa.read_calfits import CalFits
-from mwa_cal import calfits_tools as ct
+import calfits_tools as ct
 import argparse
 
 
@@ -17,7 +17,7 @@ if __name__=="__main__":
     parser.add_argument('--model_uvfits', dest='model_uvfits', help='Path to model file')
     parser.add_argument('--calfile', dest='calfile', default=None, help='Path to calfits file')
     parser.add_argument('--metafits', dest='metafits', help='Path to metafits file')
-    parser.add_argument('--reference_antenna', dest='reference_antenna', default=127, help='Reference antenna')
+    parser.add_argument('--reference_antenna', dest='reference_antenna', default=127, type=int, help='Reference antenna')
     parser.add_argument('--initialise_gains', dest='initialise_gains', action='store_true', default=None, help='Inilitialise the gains for faster convergence') 
     parser.add_argument('--phase_fit', dest='phase_fit', action='store_true', default=None, help='Allows for linear fitting of the gain solutions')
     parser.add_argument('--cal_reflection_mode_theory', dest='cal_reflection_mode_theory', action='store_true', default=None, help='Evaluate reflection modes using analytical calcualtions')
@@ -31,14 +31,17 @@ if __name__=="__main__":
 
     args = parser.parse_args()
     # reading observation
-    uvf = UVfits(args.uvfits)
+    #uvf = UVfits(args.uvfits)
     # model uvfits
-    mod_uvf = UVfits(args.model_uvfits)
+    #mod_uvf = UVfits(args.model_uvfits)
     # reading calfits
     cal = CalFits(args.calfile)
     gains = cal.gain_array
     freq_use = np.arange(len(cal.frequency_flags))
-    freq_use =  freq_use[np.where(cal.frequency_flags ==0 )]
+    if cal.frequency_flags.ndim > 1: 
+        freq_use =  freq_use[np.where(cal.frequency_flags[:, 0] ==0 )]
+    else:
+        freq_use =  freq_use[np.where(cal.frequency_flags ==0 )]
     convergence = cal.convergence
     frequency_array = cal.frequency_array
     #if args.initialise_gains:
@@ -71,7 +74,7 @@ if __name__=="__main__":
     # writing to fits file
     cal_gains = ct.cal_auto_ratio_remultiply(cal_gains, auto_ratio)
     cal_gains_autos, cal_gain_scaler = ct.vis_cal_auto_fit(vis_auto, mod_auto, cal_gains, freq_use)
-     # These subtractions replace vis_cal_subtract
+    # These subtractions replace vis_cal_subtract
     _sh = cal_gains_autos.shape
     cal.gain_array = cal_gains_autos.reshape((1, _sh[0], _sh[1], _sh[2]))
     if args.outfile is None:

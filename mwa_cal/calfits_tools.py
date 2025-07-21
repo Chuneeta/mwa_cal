@@ -312,14 +312,14 @@ def cal_auto_ratio_divide(gains, vis_auto, ref_antenna):
     gain_avg = np.nanmean(gains, axis=0)
     n_tile, n_freq, n_pol = vis_auto_avg.shape
     auto_ratio = np.empty((n_tile, n_freq, n_pol))
-    auto_gains = np.empty((n_tile, n_freq, n_pol), dtype=complex) 
+    auto_gains = np.empty((n_tile, n_freq, n_pol), dtype=complex)
     for pol_i in range(n_pol):
         v0 = vis_auto_avg[ref_antenna, :, pol_i]
         norm = weight_invert(v0)
         auto_ratio[: , :, calpols[pol_i]] = np.sqrt(
             vis_auto_avg[:, :, pol_i] * norm
         )
-        auto_gains[: ,:, calpols[pol_i]] = gain_avg[:, :, calpols[pol_i]] * weight_invert(auto_ratio[:, :, pol_i])
+        auto_gains[: ,:, calpols[pol_i]] = gain_avg[:, :, calpols[pol_i]] * weight_invert(auto_ratio[:, :, calpols[pol_i]])
     return auto_gains, auto_ratio
 
 def cal_auto_ratio_remultiply(gains, auto_ratio):

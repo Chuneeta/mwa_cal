@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 from mwa_qa.read_uvfits import UVfits
 from mwa_qa.read_calfits import CalFits

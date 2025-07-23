@@ -1,7 +1,7 @@
 import numpy as np
 from mwa_qa.read_uvfits import UVfits
 from mwa_qa.read_calfits import CalFits
-import calfits_tools as ct
+from mwa_cal import calfits_tools as ct
 import argparse
 
 

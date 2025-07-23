@@ -1,12 +1,12 @@
 from setuptools import setup
-from mwa_cal import version
+#from mwa_cal import version
 import os
 import json
 
-data = [version.git_origin, version.git_hash,
-        version.git_description, version.git_branch]
-with open(os.path.join('mwa_cal', 'GIT_INFO'), 'w') as outfile:
-    json.dump(data, outfile)
+#data = [version.git_origin, version.git_hash,
+#        version.git_description, version.git_branch]
+#with open(os.path.join('mwa_cal', 'GIT_INFO'), 'w') as outfile:
+#    json.dump(data, outfile)
 
 
 def package_files(package_dir, subdirectory):
@@ -28,7 +28,7 @@ setup_args = {
     'author':       'Chuneeta Nunhokee',
     'url':          'https://github.com/Chuneeta/mwa_cal',
     'license':      'BSD',
-    'version':      version.version,
+    'version':      '0.1.0',
     'description':  'MWA Autocorrelation Calibration.',
     'packages':     ['mwa_cal'],
     'package_dir':  {'mwa_cal': 'mwa_cal'},
@@ -36,7 +36,7 @@ setup_args = {
     'install_requires': ['numpy', 'scipy',
                          'astropy>3.0.0', 'matplotlib>=2.2',
                          'python_dateutil>=2.6.0',
-                         'pytest','mwa_qa'],
+                         'pytest','mwa_qa'],  
     'include_package_data': True,
     'zip_safe':     False,
     'scripts': ['scripts/run_autocal.py']
